@@ -3,7 +3,7 @@ package toddler;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import javax.sound.midi.SysexMessage;
+import javax.swing.JFileChooser;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -40,7 +40,7 @@ public class Toddler {
 
         if (getInputFile() != null) {
             cmdLine.addArgument("-i");
-            cmdLine.addArgument("${inputFile}");
+            cmdLine.addArgument("${inputFile}", false);
         }
 
         if (target != null) {
@@ -49,10 +49,9 @@ public class Toddler {
         }
 
         if (getOutputFile() != null) {
-            cmdLine.addArgument("${outputFile}");
+            cmdLine.addArgument("${outputFile}", false);
         }
 
-        System.out.println(cmdLine.toString());
         return cmdLine;
     }
 
@@ -126,7 +125,6 @@ public class Toddler {
         public String toString() {
             return standard + "-" + type;
         }
-
     }
 
     /**
@@ -135,13 +133,14 @@ public class Toddler {
     public static void main(String[] args) {
 
         Toddler toddler = new Toddler();
-
-        toddler.setInputFile(new File("./exe/FunkyBlues.mp4"));
-        toddler.setOutputFile(new File("./exe/FunkyBlues.vob"));
+        
+        JFileChooser chooser = new JFileChooser(new File("./exe"));
+        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    toddler.setInputFile(chooser.getSelectedFile());
+        }
+        
+        toddler.setOutputFile(new File("exe/output.vob"));
         toddler.setTarget(new Target(Target.Type.dvd, Target.Standard.pal));
-
         toddler.execute();
-
     }
-
 }
