@@ -3,8 +3,6 @@ package toddler;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -35,14 +33,21 @@ public class Toddler {
         map.put("inputFile", getInputFile());
         map.put("outputFile", getOutputFile());
 
-        cmdLine.addArgument("-i ${inputFile}");
+        if (getInputFile() != null) {
+            cmdLine.addArgument("-i");
+            cmdLine.addArgument("${inputFile}");
+        }
 
         if (target != null) {
+            cmdLine.addArgument("-target");
             cmdLine.addArgument(getTarget().toString());
         }
 
-        cmdLine.addArgument("${outputFile}");
+        if (getOutputFile()!=null) {
+            cmdLine.addArgument("${outputFile}");
+        }
 
+        System.out.println(cmdLine.toString());
         return cmdLine;
     }
 
@@ -51,7 +56,7 @@ public class Toddler {
         try {
             exit = executor.execute(buildCommand());
         } catch (IOException ex) {
-            Logger.getLogger(Toddler.class.getName()).log(Level.SEVERE, null, ex);
+
         }
         return exit;
     }
@@ -114,7 +119,7 @@ public class Toddler {
 
         @Override
         public String toString() {
-            return "-target " + standard + "-" + type;
+            return standard + "-" + type;
         }
 
     }
@@ -125,11 +130,11 @@ public class Toddler {
     public static void main(String[] args) {
 
         Toddler toddler = new Toddler();
-        
-        toddler.setInputFile(new File("inputFile"));
-        toddler.setOutputFile(new File("outputFile"));
+
+        toddler.setInputFile(new File("FunkyBlues.mp4"));
+        toddler.setOutputFile(new File("FunkyBlues.vob"));
         toddler.setTarget(new Target(Target.Type.dvd, Target.Standard.pal));
-        
+
         toddler.execute();
 
     }
