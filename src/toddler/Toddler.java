@@ -3,6 +3,7 @@ package toddler;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import javax.sound.midi.SysexMessage;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -22,7 +23,11 @@ public class Toddler {
 
     public Toddler() {
         executor = new DefaultExecutor();
-        ffmpeg = new File("./exe/ffmpeg");
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            ffmpeg = new File("./exe/ffmpeg.exe");
+        } else {
+            ffmpeg = new File("./exe/ffmpeg");
+        }
     }
 
     private CommandLine buildCommand() {
@@ -43,7 +48,7 @@ public class Toddler {
             cmdLine.addArgument(getTarget().toString());
         }
 
-        if (getOutputFile()!=null) {
+        if (getOutputFile() != null) {
             cmdLine.addArgument("${outputFile}");
         }
 
@@ -131,8 +136,8 @@ public class Toddler {
 
         Toddler toddler = new Toddler();
 
-        toddler.setInputFile(new File("FunkyBlues.mp4"));
-        toddler.setOutputFile(new File("FunkyBlues.vob"));
+        toddler.setInputFile(new File("./exe/FunkyBlues.mp4"));
+        toddler.setOutputFile(new File("./exe/FunkyBlues.vob"));
         toddler.setTarget(new Target(Target.Type.dvd, Target.Standard.pal));
 
         toddler.execute();
