@@ -1,12 +1,20 @@
 package toddler;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.HashMap;
-import javax.swing.JFileChooser;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.ExecuteResultHandler;
 import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.PumpStreamHandler;
 
 /**
  *
@@ -15,6 +23,9 @@ import org.apache.commons.exec.ExecuteWatchdog;
 public class Toddler {
 
     private final DefaultExecutor executor;
+    private final ExecuteResultHandler resultHandler;
+
+    private DataInputStream inputStream;
 
     private File ffmpeg;
     private File inputFile, outputFile;
@@ -23,11 +34,35 @@ public class Toddler {
 
     public Toddler() {
         executor = new DefaultExecutor();
+
         if (System.getProperty("os.name").startsWith("Windows")) {
             ffmpeg = new File("./exe/ffmpeg.exe");
         } else {
             ffmpeg = new File("./exe/ffmpeg");
         }
+
+        PipedOutputStream output = new PipedOutputStream();
+        PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(output);
+        this.executor.setStreamHandler(pumpStreamHandler);
+
+        try {
+            inputStream = new DataInputStream(new PipedInputStream(output));
+        } catch (IOException ex) {
+            Logger.getLogger(Toddler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        resultHandler = new ExecuteResultHandler() {
+
+            @Override
+            public void onProcessComplete(int i) {
+                
+            }
+
+            @Override
+            public void onProcessFailed(ExecuteException ee) {
+
+            }
+        };
     }
 
     private CommandLine buildCommand() {
@@ -55,14 +90,15 @@ public class Toddler {
         return cmdLine;
     }
 
-    public int execute() {
-        int exit = -1;
+    public void execute() {
         try {
-            exit = executor.execute(buildCommand());
+            executor.execute(buildCommand(), this.resultHandler);
         } catch (IOException ex) {
-
         }
-        return exit;
+    }
+
+    public InputStream getProcessOutputStream() {
+        return this.inputStream;
     }
 
     public void setTimeout(int timeout) {
@@ -125,22 +161,5 @@ public class Toddler {
         public String toString() {
             return standard + "-" + type;
         }
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-
-        Toddler toddler = new Toddler();
-        
-        JFileChooser chooser = new JFileChooser(new File("./exe"));
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                    toddler.setInputFile(chooser.getSelectedFile());
-        }
-        
-        toddler.setOutputFile(new File("exe/output.vob"));
-        toddler.setTarget(new Target(Target.Type.dvd, Target.Standard.pal));
-        toddler.execute();
     }
 }
