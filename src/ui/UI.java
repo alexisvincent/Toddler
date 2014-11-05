@@ -9,8 +9,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -115,8 +117,8 @@ public class UI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(47, 47, 47)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -162,36 +164,43 @@ public class UI extends javax.swing.JFrame {
         BufferedReader reader = new BufferedReader(new InputStreamReader(toddler.getProcessOutputStream()));
 
         toddler.execute();
-        
+
         Thread thread = new Thread(new Runnable() {
 
             @Override
             public void run() {
-                String line;
-                try {
-                    while ((line = reader.readLine()) != null) {
-                        jTextArea1.append(line);
-                        jTextArea1.append("\n");
-                        position(line);
-                        jTextArea1.repaint();
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(UI.class.getName()).log(Level.SEVERE, null, ex);
+
+                Scanner outputScanner = new Scanner(toddler.getProcessOutputStream());
+                Pattern durPattern = Pattern.compile("(?<=Duration: )[^,]*");
+                Pattern timePattern = Pattern.compile("(?<=time=)[\\d:.]*");
+                
+                String[] durationHMS = outputScanner.findWithinHorizon(durPattern, 0).split(":");
+                double totalSecs = Integer.parseInt(durationHMS[0]) * 3600
+                        + Integer.parseInt(durationHMS[1]) * 60
+                        + Double.parseDouble(durationHMS[2]);
+
+                String match;
+                String[] matchSplit;
+                while (null != (match = outputScanner.findWithinHorizon(timePattern, 0))) {
+                    matchSplit = match.split(":");
+                    double progress = (Integer.parseInt(matchSplit[0]) * 3600
+                            + Integer.parseInt(matchSplit[1]) * 60
+                            + Double.parseDouble(matchSplit[2])) / totalSecs *100;
+                    System.out.printf("Progress: %.2f%%%n", progress);
                 }
             }
-        });
+        }
+        );
         thread.start();
 
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    
     private int position(String line) {
-        
-        
-        
+
         return 0;
     }
+
     /**
      * @param args the command line arguments
      */
