@@ -14,8 +14,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.basic.BasicLookAndFeel;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.PumpStreamHandler;
 import toddler.Toddler;
@@ -38,9 +44,17 @@ public class UI extends javax.swing.JFrame {
      */
     public UI() {
         initComponents();
-
+        this.setLocationRelativeTo(null);
         toddler = new Toddler();
+        toddler.setInputFile(new File("./exe/FunkyBlues-Short.mp4"));
+        toddler.setOutputFile(new File("./exe/FunkyBlues-Short.vob"));
         toddler.setTarget(new Toddler.Target(Toddler.Target.Type.dvd, Toddler.Target.Standard.pal));
+        
+//        try {
+//            UIManager.setLookAndFeel(new NimbusLookAndFeel());
+//        } catch (UnsupportedLookAndFeelException ex) {
+//            Logger.getLogger(UI.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
 
     /**
@@ -53,40 +67,44 @@ public class UI extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel2 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        jButtonInputFile = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        jButtonOutputFile = new javax.swing.JButton();
+        jButtonConvert = new javax.swing.JButton();
         jProgressBar1 = new javax.swing.JProgressBar();
+        jPercentCompleted = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel2.setText("Select Input File");
+        jLabel2.setText("Select Input Files");
 
-        jButton2.setText("Input File");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        jButtonInputFile.setText("Input Files");
+        jButtonInputFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                jButtonInputFileActionPerformed(evt);
             }
         });
 
         jLabel3.setText("Select Output File");
 
-        jButton3.setText("Output File");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        jButtonOutputFile.setText("Output File");
+        jButtonOutputFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                jButtonOutputFileActionPerformed(evt);
             }
         });
 
-        jButton1.setText("Run");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButtonConvert.setText("Convert");
+        jButtonConvert.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButtonConvertActionPerformed(evt);
             }
         });
 
-        jProgressBar1.setForeground(new java.awt.Color(102, 255, 102));
+        jProgressBar1.setStringPainted(true);
+
+        jPercentCompleted.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jPercentCompleted.setText("Percent Completed :0%");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -95,46 +113,48 @@ public class UI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(51, 51, 51)
+                        .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
                         .addGap(79, 79, 79)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
-                            .addComponent(jButton2))
-                        .addGap(142, 142, 142)
+                            .addComponent(jButtonInputFile))
+                        .addGap(118, 118, 118)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton3)
-                                .addGap(133, 133, 133)
-                                .addComponent(jButton1))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(48, 48, 48)
-                        .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(55, Short.MAX_VALUE))
+                                .addComponent(jButtonOutputFile)
+                                .addGap(149, 149, 149)
+                                .addComponent(jButtonConvert, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(46, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jPercentCompleted, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton3)
-                            .addComponent(jButton1)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 427, Short.MAX_VALUE)
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPercentCompleted)
+                .addGap(7, 7, 7)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonInputFile)
+                    .addComponent(jButtonOutputFile)
+                    .addComponent(jButtonConvert))
+                .addGap(412, 412, 412)
+                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButtonOutputFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOutputFileActionPerformed
         JFileChooser chooser = new JFileChooser(new File("."));
 
         int choice = chooser.showSaveDialog(null);
@@ -142,9 +162,9 @@ public class UI extends javax.swing.JFrame {
         if (choice == JFileChooser.APPROVE_OPTION) {
             toddler.setOutputFile(chooser.getSelectedFile());
         }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_jButtonOutputFileActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButtonInputFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInputFileActionPerformed
         JFileChooser chooser = new JFileChooser(new File("."));
         FileFilter filter = new FileNameExtensionFilter("Video Files", "mp4", "mp2");
         chooser.addChoosableFileFilter(filter);
@@ -154,9 +174,9 @@ public class UI extends javax.swing.JFrame {
         if (choice == JFileChooser.APPROVE_OPTION) {
             toddler.setInputFile(chooser.getSelectedFile());
         }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_jButtonInputFileActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButtonConvertActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConvertActionPerformed
 
         if (toddler.getOutputFile().exists()) {
             toddler.getOutputFile().delete();
@@ -189,18 +209,32 @@ public class UI extends javax.swing.JFrame {
                             + Double.parseDouble(matchSplit[2])) / totalSecs *100;
                     position((int)progress);
                     System.out.printf("Progress: %.2f%%%n", progress);
+                    
                 }
+                CompletionPopup popup = new CompletionPopup();
+                popup.setVisible(true);
+                popup.setUIInstance(UI.this);
+                
             }
         }
         );
         thread.start();
+        
+        
 
 
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButtonConvertActionPerformed
 
+    public void cleanup() {
+        jProgressBar1.setValue(0);
+        jPercentCompleted.setText("Percent Completed :0%");
+        toddler = new Toddler();
+    }
+    
     private void position(int pos) {
 
         jProgressBar1.setValue(pos);
+        jPercentCompleted.setText("Percent Completed :"+pos+"%");
     }
 
     /**
@@ -214,7 +248,7 @@ public class UI extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -241,11 +275,12 @@ public class UI extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButtonConvert;
+    private javax.swing.JButton jButtonInputFile;
+    private javax.swing.JButton jButtonOutputFile;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jPercentCompleted;
     private javax.swing.JProgressBar jProgressBar1;
     // End of variables declaration//GEN-END:variables
 }
